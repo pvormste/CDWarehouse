@@ -43,12 +43,14 @@ func TestWarehouse(t *testing.T) {
 			warehouse.SendBatchOfCDs([]CDBatch{
 				{
 					CD: CD{
+						Title:  "Viva la Vida",
 						Artist: "Coldplay",
 					},
 					Amount: 2,
 				},
 				{
 					CD: CD{
+						Title:  "Amerika",
 						Artist: "Rammstein",
 					},
 					Amount: 1,
@@ -117,7 +119,7 @@ func TestWarehouse(t *testing.T) {
 		})
 
 		t.Run("customer can leave review if bought CD", func(t *testing.T) {
-			warehouse := Warehouse{}
+			warehouse := NewWarehouse()
 			cd := CD{
 				Title:  "Amerika",
 				Artist: "Rammstein",
@@ -128,6 +130,74 @@ func TestWarehouse(t *testing.T) {
 				},
 			}
 			assert.True(t, warehouse.CustomerCanLeaveReviewForCD(customer, &cd))
+		})
+
+		t.Run("customer can leave review with rating only", func(t *testing.T) {
+			t.Run("will return error if rating is below 1", func(t *testing.T) {
+				warehouse := NewWarehouse()
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				review := Review{
+					Rating: 0,
+					Text:   "",
+				}
+				customer := Customer{
+					BoughtCDs: map[CD]int{
+						cd: 1,
+					},
+				}
+				err := warehouse.LeaveReviewForCDByCustomer(&cd, &review, &customer)
+				assert.Error(t, err)
+			})
+
+			t.Run("will return error if rating is higher than 10", func(t *testing.T) {
+				warehouse := NewWarehouse()
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				review := Review{
+					Rating: 11,
+					Text:   "",
+				}
+				customer := Customer{
+					BoughtCDs: map[CD]int{
+						cd: 1,
+					},
+				}
+				err := warehouse.LeaveReviewForCDByCustomer(&cd, &review, &customer)
+				assert.Error(t, err)
+			})
+
+			t.Run("will be successfully adding a review to the CD", func(t *testing.T) {
+				warehouse := NewWarehouse()
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				warehouse.SendBatchOfCDs([]CDBatch{
+					{
+						CD:     cd,
+						Amount: 1,
+					},
+				})
+				review := Review{
+					Rating: 5,
+					Text:   "",
+				}
+				customer := Customer{BoughtCDs: map[CD]int{
+					cd: 1,
+				}}
+				err := warehouse.LeaveReviewForCDByCustomer(&cd, &review, &customer)
+				actualReviews := warehouse.GetReviewsForCD("Amerika", "Rammstein")
+				expectedReviews := []*Review{
+					&review,
+				}
+				assert.NoError(t, err)
+				assert.Equal(t, expectedReviews, actualReviews)
+			})
 		})
 	})
 }
