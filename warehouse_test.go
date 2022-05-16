@@ -7,9 +7,9 @@ import (
 )
 
 /*
-- Warehouse gets batches of CDs
-- Warehouse has a stock of CDs (having count)
-- Search for CDs
+- Warehouse gets batches of CDs (/)
+- Warehouse has a stock of CDs (having count) (/)
+- Search for CDs (/)
   - title
   - artist
 - Customer can buy CDs
@@ -100,6 +100,34 @@ func TestWarehouse(t *testing.T) {
 				Amount: 2,
 			}
 			assert.Equal(t, expectedCDBatch, foundCDBatch)
+		})
+	})
+
+	t.Run("CD reviews", func(t *testing.T) {
+		t.Run("customer cannot leave review without buying", func(t *testing.T) {
+			warehouse := Warehouse{}
+			customer := &Customer{
+				BoughtCDs: nil,
+			}
+			cd := &CD{
+				Title:  "Amerika",
+				Artist: "Rammstein",
+			}
+			assert.False(t, warehouse.CustomerCanLeaveReviewForCD(customer, cd))
+		})
+
+		t.Run("customer can leave review if bought CD", func(t *testing.T) {
+			warehouse := Warehouse{}
+			cd := CD{
+				Title:  "Amerika",
+				Artist: "Rammstein",
+			}
+			customer := &Customer{
+				BoughtCDs: map[CD]int{
+					cd: 1,
+				},
+			}
+			assert.True(t, warehouse.CustomerCanLeaveReviewForCD(customer, &cd))
 		})
 	})
 }

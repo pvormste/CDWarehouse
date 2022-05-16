@@ -14,6 +14,10 @@ type CDBatch struct {
 	Amount int
 }
 
+type Customer struct {
+	BoughtCDs map[CD]int
+}
+
 type Warehouse struct {
 	CDStock []CDBatch
 }
@@ -59,6 +63,11 @@ func (w *Warehouse) Search(title, artist string) *CDBatch {
 	}
 
 	return nil
+}
+
+func (w *Warehouse) CustomerCanLeaveReviewForCD(customer *Customer, cd *CD) bool {
+	_, hasBought := customer.BoughtCDs[*cd]
+	return hasBought
 }
 
 func (w *Warehouse) addBatchToStock(cdBatch CDBatch) {
