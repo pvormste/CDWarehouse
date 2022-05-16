@@ -57,4 +57,49 @@ func TestWarehouse(t *testing.T) {
 			assert.Equal(t, 3, warehouse.CDsInStock())
 		})
 	})
+
+	t.Run("search for CDs in warehouse", func(t *testing.T) {
+		t.Run("CD can't be found by title and artist", func(t *testing.T) {
+			warehouse := NewWarehouse()
+			foundCDBatch := warehouse.Search("Amerika", "Rammstein")
+			assert.Nil(t, foundCDBatch)
+		})
+
+		t.Run("CD can't be found because it doesn't exist with this title", func(t *testing.T) {
+			warehouse := NewWarehouse()
+			warehouse.SendBatchOfCDs([]CDBatch{
+				{
+					CD: CD{
+						Title:  "Amerika",
+						Artist: "Rammstein",
+					},
+					Amount: 1,
+				},
+			})
+			foundCDBatch := warehouse.Search("Rosenrot", "Rammstein")
+			assert.Nil(t, foundCDBatch)
+		})
+
+		t.Run("CD can be found by title and artist", func(t *testing.T) {
+			warehouse := NewWarehouse()
+			warehouse.SendBatchOfCDs([]CDBatch{
+				{
+					CD: CD{
+						Title:  "Amerika",
+						Artist: "Rammstein",
+					},
+					Amount: 2,
+				},
+			})
+			foundCDBatch := warehouse.Search("Amerika", "Rammstein")
+			expectedCDBatch := &CDBatch{
+				CD: CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				},
+				Amount: 2,
+			}
+			assert.Equal(t, expectedCDBatch, foundCDBatch)
+		})
+	})
 }

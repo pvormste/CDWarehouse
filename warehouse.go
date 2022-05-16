@@ -46,6 +46,21 @@ func (w *Warehouse) CDsInStock() int {
 	return cdCount
 }
 
+func (w *Warehouse) Search(title, artist string) *CDBatch {
+	lookingForCD := CD{
+		Title:  title,
+		Artist: artist,
+	}
+
+	for _, cdBatchInStock := range w.CDStock {
+		if cdBatchInStock.CD.Equals(lookingForCD) {
+			return &cdBatchInStock
+		}
+	}
+
+	return nil
+}
+
 func (w *Warehouse) addBatchToStock(cdBatch CDBatch) {
 	w.CDStock = append(w.CDStock, cdBatch)
 }
