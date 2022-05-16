@@ -5,6 +5,10 @@ type CD struct {
 	Artist string
 }
 
+func (c *CD) Equals(otherCD CD) bool {
+	return c.Title == otherCD.Title && c.Artist == otherCD.Artist
+}
+
 type CDBatch struct {
 	CD     CD
 	Amount int
@@ -22,13 +26,13 @@ func (w *Warehouse) SendBatchOfCDs(incomingBatches []CDBatch) {
 	for _, incomingBatch := range incomingBatches {
 		foundInStock := false
 		for _, batchInStock := range w.CDStock {
-			if batchInStock.CD.Title == incomingBatch.CD.Title && batchInStock.CD.Artist == incomingBatch.CD.Artist {
+			if batchInStock.CD.Equals(incomingBatch.CD) {
 				batchInStock.Amount += incomingBatch.Amount
 				foundInStock = true
 			}
 		}
 		if !foundInStock {
-			w.CDStock = append(w.CDStock, incomingBatch)
+			w.addBatchToStock(incomingBatch)
 		}
 	}
 
@@ -40,4 +44,8 @@ func (w *Warehouse) CDsInStock() int {
 		cdCount += batchInStock.Amount
 	}
 	return cdCount
+}
+
+func (w *Warehouse) addBatchToStock(cdBatch CDBatch) {
+	w.CDStock = append(w.CDStock, cdBatch)
 }
