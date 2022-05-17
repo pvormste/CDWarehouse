@@ -302,5 +302,57 @@ func TestWarehouse(t *testing.T) {
 				assert.NoError(t, err)
 			})
 		})
+
+		t.Run("Price for Album", func(t *testing.T) {
+			t.Run("Get normal price for an Album if its not in the Top 100", func(t *testing.T) {
+				mockCtrl := gomock.NewController(t)
+				mockChartsProvider := NewMockChartsProvider(mockCtrl)
+				mockChartsProvider.EXPECT().
+					PositionAndPriceForAlbum("Amerika", "Rammstein").
+					Return(150, 95)
+
+				warehouse := NewWarehouse(
+					WithChartsProvider(mockChartsProvider),
+				)
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
+					{
+						CD: CD{
+							Title:  "Amerika",
+							Artist: "Rammstein",
+						},
+						Amount:  5,
+						Reviews: nil,
+					},
+				})
+
+				albumPrice := warehouse.PriceForAlbum("Amerika", "Rammstein")
+				assert.Equal(t, 100, albumPrice)
+			})
+
+			t.Run("Get a 1 pound lower price if the album is in the top 100 charts", func(t *testing.T) {
+				mockCtrl := gomock.NewController(t)
+				mockChartsProvider := NewMockChartsProvider(mockCtrl)
+				mockChartsProvider.EXPECT().
+					PositionAndPriceForAlbum("Wait For U", "Future Featuring Drake & Tems").
+					Return(1, 80)
+
+				warehouse := NewWarehouse(
+					WithChartsProvider(mockChartsProvider),
+				)
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
+					{
+						CD: CD{
+							Title:  "Wait For U",
+							Artist: "Future Featuring Drake & Tems",
+						},
+						Amount:  5,
+						Reviews: nil,
+					},
+				})
+
+				albumPrice := warehouse.PriceForAlbum("Wait For U", "Future Featuring Drake & Tems")
+				assert.Equal(t, 79, albumPrice)
+			})
+		})
 	})
 }

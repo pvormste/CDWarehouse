@@ -102,6 +102,14 @@ func (w *Warehouse) SellCDToCustomer(cd *CD, customer *Customer) error {
 	return w.chartsProvider.Notify(cd.Title, cd.Artist, 1)
 }
 
+func (w *Warehouse) PriceForAlbum(title, artist string) int {
+	position, competitorPrice := w.chartsProvider.PositionAndPriceForAlbum(title, artist)
+	if position <= 100 {
+		return competitorPrice - 1
+	}
+	return 100
+}
+
 func (w *Warehouse) LeaveReviewForCDByCustomer(cd *CD, review *Review, customer *Customer) error {
 	if !customer.CanLeaveReviewForCD(cd) {
 		return ErrCustomerNotAllowedToLeaveReview

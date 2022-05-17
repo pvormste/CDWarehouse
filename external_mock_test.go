@@ -83,3 +83,18 @@ func (mr *MockChartsProviderMockRecorder) Notify(title, artist, amount interface
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Notify", reflect.TypeOf((*MockChartsProvider)(nil).Notify), title, artist, amount)
 }
+
+// PositionAndPriceForAlbum mocks base method.
+func (m *MockChartsProvider) PositionAndPriceForAlbum(title, artist string) (int, int) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PositionAndPriceForAlbum", title, artist)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(int)
+	return ret0, ret1
+}
+
+// PositionAndPriceForAlbum indicates an expected call of PositionAndPriceForAlbum.
+func (mr *MockChartsProviderMockRecorder) PositionAndPriceForAlbum(title, artist interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PositionAndPriceForAlbum", reflect.TypeOf((*MockChartsProvider)(nil).PositionAndPriceForAlbum), title, artist)
+}
