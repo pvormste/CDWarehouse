@@ -4,6 +4,6 @@ type PaymentProvider interface {
 	ProcessPayment() error
 }
 
-type ChartsNotifier interface {
+type ChartsProvider interface {
 	Notify(title, artist string, amount int) error
 }

@@ -9,22 +9,22 @@ var ErrCustomerNotAllowedToLeaveReview = errors.New("customer is not allowed to 
 
 type DependencyOption func(w *Warehouse)
 
-func WithPayment(paymentProvider PaymentProvider) DependencyOption {
+func WithPaymentProvider(paymentProvider PaymentProvider) DependencyOption {
 	return func(w *Warehouse) {
 		w.paymentProvider = paymentProvider
 	}
 }
 
-func WithChartsNotifier(chartsNotifier ChartsNotifier) DependencyOption {
+func WithChartsProvider(chartsProvider ChartsProvider) DependencyOption {
 	return func(w *Warehouse) {
-		w.chartsNotifier = chartsNotifier
+		w.chartsProvider = chartsProvider
 	}
 }
 
 type Warehouse struct {
 	CDStock         []*CDBatch
 	paymentProvider PaymentProvider
-	chartsNotifier  ChartsNotifier
+	chartsProvider  ChartsProvider
 }
 
 func NewWarehouse(opts ...DependencyOption) *Warehouse {
@@ -99,7 +99,7 @@ func (w *Warehouse) SellCDToCustomer(cd *CD, customer *Customer) error {
 	}
 	cdBatch.DecreaseAmount()
 	customer.BuyCD(cd)
-	return w.chartsNotifier.Notify(cd.Title, cd.Artist, 1)
+	return w.chartsProvider.Notify(cd.Title, cd.Artist, 1)
 }
 
 func (w *Warehouse) LeaveReviewForCDByCustomer(cd *CD, review *Review, customer *Customer) error {

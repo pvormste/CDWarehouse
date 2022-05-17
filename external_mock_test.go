@@ -47,31 +47,31 @@ func (mr *MockPaymentProviderMockRecorder) ProcessPayment() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessPayment", reflect.TypeOf((*MockPaymentProvider)(nil).ProcessPayment))
 }
 
-// MockChartsNotifier is a mock of ChartsNotifier interface.
-type MockChartsNotifier struct {
+// MockChartsProvider is a mock of ChartsProvider interface.
+type MockChartsProvider struct {
 	ctrl     *gomock.Controller
-	recorder *MockChartsNotifierMockRecorder
+	recorder *MockChartsProviderMockRecorder
 }
 
-// MockChartsNotifierMockRecorder is the mock recorder for MockChartsNotifier.
-type MockChartsNotifierMockRecorder struct {
-	mock *MockChartsNotifier
+// MockChartsProviderMockRecorder is the mock recorder for MockChartsProvider.
+type MockChartsProviderMockRecorder struct {
+	mock *MockChartsProvider
 }
 
-// NewMockChartsNotifier creates a new mock instance.
-func NewMockChartsNotifier(ctrl *gomock.Controller) *MockChartsNotifier {
-	mock := &MockChartsNotifier{ctrl: ctrl}
-	mock.recorder = &MockChartsNotifierMockRecorder{mock}
+// NewMockChartsProvider creates a new mock instance.
+func NewMockChartsProvider(ctrl *gomock.Controller) *MockChartsProvider {
+	mock := &MockChartsProvider{ctrl: ctrl}
+	mock.recorder = &MockChartsProviderMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockChartsNotifier) EXPECT() *MockChartsNotifierMockRecorder {
+func (m *MockChartsProvider) EXPECT() *MockChartsProviderMockRecorder {
 	return m.recorder
 }
 
 // Notify mocks base method.
-func (m *MockChartsNotifier) Notify(title, artist string, amount int) error {
+func (m *MockChartsProvider) Notify(title, artist string, amount int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Notify", title, artist, amount)
 	ret0, _ := ret[0].(error)
@@ -79,7 +79,7 @@ func (m *MockChartsNotifier) Notify(title, artist string, amount int) error {
 }
 
 // Notify indicates an expected call of Notify.
-func (mr *MockChartsNotifierMockRecorder) Notify(title, artist, amount interface{}) *gomock.Call {
+func (mr *MockChartsProviderMockRecorder) Notify(title, artist, amount interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Notify", reflect.TypeOf((*MockChartsNotifier)(nil).Notify), title, artist, amount)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Notify", reflect.TypeOf((*MockChartsProvider)(nil).Notify), title, artist, amount)
 }

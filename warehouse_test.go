@@ -278,14 +278,14 @@ func TestWarehouse(t *testing.T) {
 
 			t.Run("should notify charts on payment", func(t *testing.T) {
 				ctrl := gomock.NewController(t)
-				chartsNotifierMock := NewMockChartsNotifier(ctrl)
-				chartsNotifierMock.EXPECT().
+				chartsProviderMock := NewMockChartsProvider(ctrl)
+				chartsProviderMock.EXPECT().
 					Notify("Amerika", "Rammstein", 1).
 					Return(nil)
 
 				warehouse := NewWarehouse(
-					WithPayment(&FakePaymentProvider{}),
-					WithChartsNotifier(chartsNotifierMock),
+					WithPaymentProvider(&FakePaymentProvider{}),
+					WithChartsProvider(chartsProviderMock),
 				)
 				cd := CD{
 					Title:  "Amerika",
