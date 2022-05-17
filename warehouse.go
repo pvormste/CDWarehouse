@@ -28,15 +28,6 @@ func (c *CDBatch) DecreaseAmount() {
 	}
 }
 
-type Customer struct {
-	boughtCDs map[CD]int
-}
-
-func (c *Customer) CanLeaveReviewForCD(cd *CD) bool {
-	_, hasBought := c.boughtCDs[*cd]
-	return hasBought
-}
-
 type Review struct {
 	Rating int
 	Text   string
@@ -118,6 +109,7 @@ func (w *Warehouse) SellCDToCustomer(cd *CD, customer *Customer) error {
 		return errors.New("cd not found")
 	}
 	cdBatch.DecreaseAmount()
+	customer.BuyCD(cd)
 	return nil
 }
 

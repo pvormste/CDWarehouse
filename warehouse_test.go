@@ -251,6 +251,7 @@ func TestWarehouse(t *testing.T) {
 				err := warehouse.SellCDToCustomer(&cd, &customer)
 				assert.Error(t, err)
 				assert.Equal(t, 5, warehouse.AmountOfASpecificCDInStock("Amerika", "Rammstein"))
+				assert.False(t, customer.HasBoughtCD(&cd))
 			})
 
 			t.Run("payment does work and reduces the stock", func(t *testing.T) {
@@ -271,6 +272,7 @@ func TestWarehouse(t *testing.T) {
 				err := warehouse.SellCDToCustomer(&cd, &customer)
 				assert.NoError(t, err)
 				assert.Equal(t, 4, warehouse.AmountOfASpecificCDInStock("Amerika", "Rammstein"))
+				assert.True(t, customer.HasBoughtCD(&cd))
 			})
 		})
 	})
