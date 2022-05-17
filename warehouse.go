@@ -7,36 +7,6 @@ import (
 var ErrInvalidRating = errors.New("invalid rating - should be between 1 and 10 (including)")
 var ErrCustomerNotAllowedToLeaveReview = errors.New("customer is not allowed to leave an error")
 
-type CD struct {
-	Title  string
-	Artist string
-}
-
-func (c *CD) Equals(otherCD CD) bool {
-	return c.Title == otherCD.Title && c.Artist == otherCD.Artist
-}
-
-type CDBatch struct {
-	CD      CD
-	Amount  int
-	Reviews []*Review
-}
-
-func (c *CDBatch) DecreaseAmount() {
-	if c.Amount > 0 {
-		c.Amount--
-	}
-}
-
-type Review struct {
-	Rating int
-	Text   string
-}
-
-func (r *Review) IsValid() bool {
-	return r.Rating < 1 || r.Rating > 10
-}
-
 type Warehouse struct {
 	CDStock         []*CDBatch
 	paymentProvider PaymentProvider
