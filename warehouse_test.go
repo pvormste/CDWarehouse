@@ -107,29 +107,27 @@ func TestWarehouse(t *testing.T) {
 
 	t.Run("CD reviews", func(t *testing.T) {
 		t.Run("customer cannot leave review without buying", func(t *testing.T) {
-			warehouse := Warehouse{}
 			customer := &Customer{
-				BoughtCDs: nil,
+				boughtCDs: nil,
 			}
 			cd := &CD{
 				Title:  "Amerika",
 				Artist: "Rammstein",
 			}
-			assert.False(t, warehouse.CustomerCanLeaveReviewForCD(customer, cd))
+			assert.False(t, customer.CanLeaveReviewForCD(cd))
 		})
 
 		t.Run("customer can leave review if bought CD", func(t *testing.T) {
-			warehouse := NewWarehouse()
 			cd := CD{
 				Title:  "Amerika",
 				Artist: "Rammstein",
 			}
 			customer := &Customer{
-				BoughtCDs: map[CD]int{
+				boughtCDs: map[CD]int{
 					cd: 1,
 				},
 			}
-			assert.True(t, warehouse.CustomerCanLeaveReviewForCD(customer, &cd))
+			assert.True(t, customer.CanLeaveReviewForCD(&cd))
 		})
 
 		t.Run("customer can leave review with rating only", func(t *testing.T) {
@@ -144,7 +142,7 @@ func TestWarehouse(t *testing.T) {
 					Text:   "",
 				}
 				customer := Customer{
-					BoughtCDs: map[CD]int{
+					boughtCDs: map[CD]int{
 						cd: 1,
 					},
 				}
@@ -163,7 +161,7 @@ func TestWarehouse(t *testing.T) {
 					Text:   "",
 				}
 				customer := Customer{
-					BoughtCDs: map[CD]int{
+					boughtCDs: map[CD]int{
 						cd: 1,
 					},
 				}
@@ -187,7 +185,7 @@ func TestWarehouse(t *testing.T) {
 					Rating: 5,
 					Text:   "",
 				}
-				customer := Customer{BoughtCDs: map[CD]int{
+				customer := Customer{boughtCDs: map[CD]int{
 					cd: 1,
 				}}
 				err := warehouse.LeaveReviewForCDByCustomer(&cd, &review, &customer)

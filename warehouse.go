@@ -22,7 +22,12 @@ type CDBatch struct {
 }
 
 type Customer struct {
-	BoughtCDs map[CD]int
+	boughtCDs map[CD]int
+}
+
+func (c *Customer) CanLeaveReviewForCD(cd *CD) bool {
+	_, hasBought := c.boughtCDs[*cd]
+	return hasBought
 }
 
 type Review struct {
@@ -75,11 +80,6 @@ func (w *Warehouse) Search(title, artist string) *CDBatch {
 	}
 
 	return nil
-}
-
-func (w *Warehouse) CustomerCanLeaveReviewForCD(customer *Customer, cd *CD) bool {
-	_, hasBought := customer.BoughtCDs[*cd]
-	return hasBought
 }
 
 func (w *Warehouse) LeaveReviewForCDByCustomer(cd *CD, review *Review, customer *Customer) error {
