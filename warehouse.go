@@ -7,13 +7,32 @@ import (
 var ErrInvalidRating = errors.New("invalid rating - should be between 1 and 10 (including)")
 var ErrCustomerNotAllowedToLeaveReview = errors.New("customer is not allowed to leave an error")
 
+type DependencyOption func(w *Warehouse)
+
+func WithPayment(paymentProvider PaymentProvider) DependencyOption {
+	return func(w *Warehouse) {
+		w.paymentProvider = paymentProvider
+	}
+}
+
+func WithChartsNotifier(chartsNotifier ChartsNotifier) DependencyOption {
+	return func(w *Warehouse) {
+		w.chartsNotifier = chartsNotifier
+	}
+}
+
 type Warehouse struct {
 	CDStock         []*CDBatch
 	paymentProvider PaymentProvider
+	chartsNotifier  ChartsNotifier
 }
 
-func NewWarehouse() *Warehouse {
-	return &Warehouse{}
+func NewWarehouse(opts ...DependencyOption) *Warehouse {
+	w := &Warehouse{}
+	for _, opt := range opts {
+		opt(w)
+	}
+	return w
 }
 
 func NewWarehouseWithPaymentProvider(provider PaymentProvider) *Warehouse {
@@ -80,7 +99,7 @@ func (w *Warehouse) SellCDToCustomer(cd *CD, customer *Customer) error {
 	}
 	cdBatch.DecreaseAmount()
 	customer.BuyCD(cd)
-	return nil
+	return w.chartsNotifier.Notify(cd.Title, cd.Artist, 1)
 }
 
 func (w *Warehouse) LeaveReviewForCDByCustomer(cd *CD, review *Review, customer *Customer) error {

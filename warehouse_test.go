@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -273,6 +274,32 @@ func TestWarehouse(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, 4, warehouse.AmountOfASpecificCDInStock("Amerika", "Rammstein"))
 				assert.True(t, customer.HasBoughtCD(&cd))
+			})
+
+			t.Run("should notify charts on payment", func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				chartsNotifierMock := NewMockChartsNotifier(ctrl)
+				chartsNotifierMock.EXPECT().
+					Notify("Amerika", "Rammstein", 1).
+					Return(nil)
+
+				warehouse := NewWarehouse(
+					WithPayment(&FakePaymentProvider{}),
+					WithChartsNotifier(chartsNotifierMock),
+				)
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
+					{
+						CD:     cd,
+						Amount: 5,
+					},
+				})
+				customer := Customer{}
+				err := warehouse.SellCDToCustomer(&cd, &customer)
+				assert.NoError(t, err)
 			})
 		})
 	})
