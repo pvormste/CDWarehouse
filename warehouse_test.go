@@ -23,13 +23,13 @@ func TestWarehouse(t *testing.T) {
 	t.Run("warehouse gets batches of CDs", func(t *testing.T) {
 		t.Run("empty batch", func(t *testing.T) {
 			warehouse := NewWarehouse()
-			warehouse.SendBatchOfCDs([]CDBatch{})
+			warehouse.ReceiveBatchOfCDs([]CDBatch{})
 			assert.Equal(t, 0, warehouse.CDsInStock())
 		})
 
 		t.Run("sending a single CD", func(t *testing.T) {
 			warehouse := NewWarehouse()
-			warehouse.SendBatchOfCDs([]CDBatch{
+			warehouse.ReceiveBatchOfCDs([]CDBatch{
 				{
 					CD:     CD{},
 					Amount: 1,
@@ -40,7 +40,7 @@ func TestWarehouse(t *testing.T) {
 
 		t.Run("sending multiple CDs", func(t *testing.T) {
 			warehouse := NewWarehouse()
-			warehouse.SendBatchOfCDs([]CDBatch{
+			warehouse.ReceiveBatchOfCDs([]CDBatch{
 				{
 					CD: CD{
 						Title:  "Viva la Vida",
@@ -69,7 +69,7 @@ func TestWarehouse(t *testing.T) {
 
 		t.Run("CD can't be found because it doesn't exist with this title", func(t *testing.T) {
 			warehouse := NewWarehouse()
-			warehouse.SendBatchOfCDs([]CDBatch{
+			warehouse.ReceiveBatchOfCDs([]CDBatch{
 				{
 					CD: CD{
 						Title:  "Amerika",
@@ -84,7 +84,7 @@ func TestWarehouse(t *testing.T) {
 
 		t.Run("CD can be found by title and artist", func(t *testing.T) {
 			warehouse := NewWarehouse()
-			warehouse.SendBatchOfCDs([]CDBatch{
+			warehouse.ReceiveBatchOfCDs([]CDBatch{
 				{
 					CD: CD{
 						Title:  "Amerika",
@@ -177,7 +177,7 @@ func TestWarehouse(t *testing.T) {
 					Title:  "Amerika",
 					Artist: "Rammstein",
 				}
-				warehouse.SendBatchOfCDs([]CDBatch{
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
 					{
 						CD:     cd,
 						Amount: 1,

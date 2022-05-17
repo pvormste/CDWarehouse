@@ -38,7 +38,7 @@ func NewWarehouse() *Warehouse {
 	return &Warehouse{}
 }
 
-func (w *Warehouse) SendBatchOfCDs(incomingBatches []CDBatch) {
+func (w *Warehouse) ReceiveBatchOfCDs(incomingBatches []CDBatch) {
 	for _, incomingBatch := range incomingBatches {
 		foundInStock := false
 		for _, batchInStock := range w.CDStock {
