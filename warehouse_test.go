@@ -235,7 +235,13 @@ func TestWarehouse(t *testing.T) {
 
 		t.Run("warehouse selling a CD to a customer", func(t *testing.T) {
 			t.Run("payment doesn't work", func(t *testing.T) {
-				warehouse := NewWarehouseWithPaymentProvider(&FakePaymentProvider{failPayment: true})
+				mockCtrl := gomock.NewController(t)
+				mockChartsProvider := NewMockChartsProvider(mockCtrl)
+
+				warehouse := NewWarehouse(
+					WithPaymentProvider(&FakePaymentProvider{failPayment: true}),
+					WithChartsProvider(mockChartsProvider),
+				)
 				cd := CD{
 					Title:  "Amerika",
 					Artist: "Rammstein",
@@ -256,7 +262,14 @@ func TestWarehouse(t *testing.T) {
 			})
 
 			t.Run("payment does work and reduces the stock", func(t *testing.T) {
-				warehouse := NewWarehouseWithPaymentProvider(&FakePaymentProvider{})
+				mockCtrl := gomock.NewController(t)
+				mockChartsProvider := NewMockChartsProvider(mockCtrl)
+				mockChartsProvider.EXPECT().Notify("Amerika", "Rammstein", 1)
+
+				warehouse := NewWarehouse(
+					WithPaymentProvider(&FakePaymentProvider{}),
+					WithChartsProvider(mockChartsProvider),
+				)
 				cd := CD{
 					Title:  "Amerika",
 					Artist: "Rammstein",

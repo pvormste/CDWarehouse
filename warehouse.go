@@ -35,12 +35,6 @@ func NewWarehouse(opts ...DependencyOption) *Warehouse {
 	return w
 }
 
-func NewWarehouseWithPaymentProvider(provider PaymentProvider) *Warehouse {
-	return &Warehouse{
-		paymentProvider: provider,
-	}
-}
-
 func (w *Warehouse) ReceiveBatchOfCDs(incomingBatches []CDBatch) {
 	for _, incomingBatch := range incomingBatches {
 		foundInStock := false
