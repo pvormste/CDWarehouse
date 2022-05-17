@@ -22,6 +22,12 @@ type CDBatch struct {
 	Reviews []*Review
 }
 
+func (c *CDBatch) DecreaseAmount() {
+	if c.Amount > 0 {
+		c.Amount--
+	}
+}
+
 type Customer struct {
 	boughtCDs map[CD]int
 }
@@ -36,12 +42,23 @@ type Review struct {
 	Text   string
 }
 
+func (r *Review) IsValid() bool {
+	return r.Rating < 1 || r.Rating > 10
+}
+
 type Warehouse struct {
-	CDStock []*CDBatch
+	CDStock         []*CDBatch
+	paymentProvider PaymentProvider
 }
 
 func NewWarehouse() *Warehouse {
 	return &Warehouse{}
+}
+
+func NewWarehouseWithPaymentProvider(provider PaymentProvider) *Warehouse {
+	return &Warehouse{
+		paymentProvider: provider,
+	}
 }
 
 func (w *Warehouse) ReceiveBatchOfCDs(incomingBatches []CDBatch) {
@@ -68,6 +85,14 @@ func (w *Warehouse) CDsInStock() int {
 	return cdCount
 }
 
+func (w *Warehouse) AmountOfASpecificCDInStock(title, artist string) int {
+	cdBatch := w.Search(title, artist)
+	if cdBatch == nil {
+		return 0
+	}
+	return cdBatch.Amount
+}
+
 func (w *Warehouse) Search(title, artist string) *CDBatch {
 	lookingForCD := CD{
 		Title:  title,
@@ -83,11 +108,24 @@ func (w *Warehouse) Search(title, artist string) *CDBatch {
 	return nil
 }
 
+func (w *Warehouse) SellCDToCustomer(cd *CD, customer *Customer) error {
+	err := w.paymentProvider.ProcessPayment()
+	if err != nil {
+		return err
+	}
+	cdBatch := w.Search(cd.Title, cd.Artist)
+	if cdBatch == nil {
+		return errors.New("cd not found")
+	}
+	cdBatch.DecreaseAmount()
+	return nil
+}
+
 func (w *Warehouse) LeaveReviewForCDByCustomer(cd *CD, review *Review, customer *Customer) error {
 	if !customer.CanLeaveReviewForCD(cd) {
 		return ErrCustomerNotAllowedToLeaveReview
 	}
-	if review.Rating < 1 || review.Rating > 10 {
+	if !review.IsValid() {
 		return ErrInvalidRating
 	}
 	cdBatchInStock := w.Search(cd.Title, cd.Artist)

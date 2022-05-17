@@ -1,6 +1,7 @@
 package warehouse
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,6 +19,17 @@ import (
   - reviews from customers (rated 1 - 10)
     - optional: text
 */
+
+type FakePaymentProvider struct {
+	failPayment bool
+}
+
+func (f *FakePaymentProvider) ProcessPayment() error {
+	if f.failPayment {
+		return errors.New("payment failed")
+	}
+	return nil
+}
 
 func TestWarehouse(t *testing.T) {
 	t.Run("warehouse gets batches of CDs", func(t *testing.T) {
@@ -217,6 +229,48 @@ func TestWarehouse(t *testing.T) {
 				actualReviews := warehouse.GetReviewsForCD("Amerika", "Rammstein")
 				assert.Error(t, err)
 				assert.Equal(t, 0, len(actualReviews))
+			})
+		})
+
+		t.Run("warehouse selling a CD to a customer", func(t *testing.T) {
+			t.Run("payment doesn't work", func(t *testing.T) {
+				warehouse := NewWarehouseWithPaymentProvider(&FakePaymentProvider{failPayment: true})
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
+					{
+						CD:     cd,
+						Amount: 5,
+					},
+				})
+
+				customer := Customer{}
+
+				err := warehouse.SellCDToCustomer(&cd, &customer)
+				assert.Error(t, err)
+				assert.Equal(t, 5, warehouse.AmountOfASpecificCDInStock("Amerika", "Rammstein"))
+			})
+
+			t.Run("payment does work and reduces the stock", func(t *testing.T) {
+				warehouse := NewWarehouseWithPaymentProvider(&FakePaymentProvider{})
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
+					{
+						CD:     cd,
+						Amount: 5,
+					},
+				})
+
+				customer := Customer{}
+
+				err := warehouse.SellCDToCustomer(&cd, &customer)
+				assert.NoError(t, err)
+				assert.Equal(t, 4, warehouse.AmountOfASpecificCDInStock("Amerika", "Rammstein"))
 			})
 		})
 	})
