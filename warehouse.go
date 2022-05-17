@@ -5,6 +5,7 @@ import (
 )
 
 var ErrInvalidRating = errors.New("invalid rating - should be between 1 and 10 (including)")
+var ErrCustomerNotAllowedToLeaveReview = errors.New("customer is not allowed to leave an error")
 
 type CD struct {
 	Title  string
@@ -83,6 +84,9 @@ func (w *Warehouse) Search(title, artist string) *CDBatch {
 }
 
 func (w *Warehouse) LeaveReviewForCDByCustomer(cd *CD, review *Review, customer *Customer) error {
+	if !customer.CanLeaveReviewForCD(cd) {
+		return ErrCustomerNotAllowedToLeaveReview
+	}
 	if review.Rating < 1 || review.Rating > 10 {
 		return ErrInvalidRating
 	}

@@ -14,7 +14,7 @@ import (
   - artist
 - Customer can buy CDs
   - Payment by external provider
-- CDs can have
+- CDs can have (/)
   - reviews from customers (rated 1 - 10)
     - optional: text
 */
@@ -195,6 +195,28 @@ func TestWarehouse(t *testing.T) {
 				}
 				assert.NoError(t, err)
 				assert.Equal(t, expectedReviews, actualReviews)
+			})
+			t.Run("customer who hasn't bought a CD can't leave a review", func(t *testing.T) {
+				warehouse := NewWarehouse()
+				cd := CD{
+					Title:  "Amerika",
+					Artist: "Rammstein",
+				}
+				warehouse.ReceiveBatchOfCDs([]CDBatch{
+					{
+						CD:     cd,
+						Amount: 1,
+					},
+				})
+				review := Review{
+					Rating: 8,
+					Text:   "",
+				}
+				customer := Customer{}
+				err := warehouse.LeaveReviewForCDByCustomer(&cd, &review, &customer)
+				actualReviews := warehouse.GetReviewsForCD("Amerika", "Rammstein")
+				assert.Error(t, err)
+				assert.Equal(t, 0, len(actualReviews))
 			})
 		})
 	})
